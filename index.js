@@ -9,7 +9,7 @@ app.use(express.json())
 
 
 app.get("/api/get", (req,res)=>{
-    db.query("SELECT * FROM Januar", (err,result)=>{
+    db.query("SELECT SUM (bevetel) FROM Januar", (err,result)=>{
         if(err) {
         console.log(err)
         } 
