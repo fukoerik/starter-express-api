@@ -32,5 +32,20 @@ app.get("/api/get/jan/kiad", (req,res)=>{
     res.send(result)
     });   });
 
+app.get("/api/get/feb/bev", (req,res)=>{
+    db.query("SELECT SUM(bevetel) FROM adatok WHERE honap = 'Február'", (err,result)=>{
+        if(err) {
+        console.log(err)
+        } 
+    res.send(result)
+    });   });
+
+app.get("/api/get/feb/kiad", (req,res)=>{
+    db.query("SELECT SUM(kiadas) FROM adatok WHERE honap = 'Február'", (err,result)=>{
+        if(err) {
+        console.log(err)
+        } 
+    res.send(result)
+    });   });
 
 app.listen(process.env.PORT || 3000)
