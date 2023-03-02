@@ -16,5 +16,13 @@ app.get("/api/get", (req,res)=>{
     res.send(result)
     });   });
 
+app.get("/api/get/jan", (req,res)=>{
+    db.query("SELECT SUM(bevetel) FROM adatok WHERE honap = 'Január'", (err,result)=>{
+        if(err) {
+        console.log(err)
+        } 
+    res.send(result)
+    });   });
+
 
 app.listen(process.env.PORT || 3000)
