@@ -25,7 +25,7 @@ app.get("/api/get/jan/bev", (req,res)=>{
     });   });
 
 app.get("/api/get/jan/kiad", (req,res)=>{
-    db.query("SELECT SUM(bevetel) FROM adatok WHERE honap = 'Január'", (err,result)=>{
+    db.query("SELECT SUM(kiadas) FROM adatok WHERE honap = 'Január'", (err,result)=>{
         if(err) {
         console.log(err)
         } 
