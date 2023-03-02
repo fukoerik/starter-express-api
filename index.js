@@ -84,4 +84,140 @@ app.get("/api/get/feb/kiad", (req,res)=>{
         res.send(result)
         });   });
 
+    //Május
+    app.get("/api/get/maj/bev", (req,res)=>{
+        db.query("SELECT SUM(bevetel) FROM adatok WHERE honap = 'Május'", (err,result)=>{
+            if(err) {
+            console.log(err)
+            } 
+        res.send(result)
+        });   });
+    
+    app.get("/api/get/maj/kiad", (req,res)=>{
+        db.query("SELECT SUM(kiadas) FROM adatok WHERE honap = 'Május'", (err,result)=>{
+            if(err) {
+            console.log(err)
+            } 
+        res.send(result)
+        });   });
+
+    //Június
+    app.get("/api/get/jun/bev", (req,res)=>{
+        db.query("SELECT SUM(bevetel) FROM adatok WHERE honap = 'Június'", (err,result)=>{
+            if(err) {
+            console.log(err)
+            } 
+        res.send(result)
+        });   });
+    
+    app.get("/api/get/jun/kiad", (req,res)=>{
+        db.query("SELECT SUM(kiadas) FROM adatok WHERE honap = 'Június'", (err,result)=>{
+            if(err) {
+            console.log(err)
+            } 
+        res.send(result)
+        });   });
+
+    //Július
+    app.get("/api/get/jul/bev", (req,res)=>{
+        db.query("SELECT SUM(bevetel) FROM adatok WHERE honap = 'Július'", (err,result)=>{
+            if(err) {
+            console.log(err)
+            } 
+        res.send(result)
+        });   });
+    
+    app.get("/api/get/jul/kiad", (req,res)=>{
+        db.query("SELECT SUM(kiadas) FROM adatok WHERE honap = 'Július'", (err,result)=>{
+            if(err) {
+            console.log(err)
+            } 
+        res.send(result)
+        });   });
+
+    //Augusztus
+    app.get("/api/get/aug/bev", (req,res)=>{
+        db.query("SELECT SUM(bevetel) FROM adatok WHERE honap = 'Augusztus'", (err,result)=>{
+            if(err) {
+            console.log(err)
+            } 
+        res.send(result)
+        });   });
+    
+    app.get("/api/get/aug/kiad", (req,res)=>{
+        db.query("SELECT SUM(kiadas) FROM adatok WHERE honap = 'Augusztus'", (err,result)=>{
+            if(err) {
+            console.log(err)
+            } 
+        res.send(result)
+        });   });
+
+    //Szeptember
+    app.get("/api/get/szep/bev", (req,res)=>{
+        db.query("SELECT SUM(bevetel) FROM adatok WHERE honap = 'Szeptember'", (err,result)=>{
+            if(err) {
+            console.log(err)
+            } 
+        res.send(result)
+        });   });
+    
+    app.get("/api/get/szep/kiad", (req,res)=>{
+        db.query("SELECT SUM(kiadas) FROM adatok WHERE honap = 'Szeptember'", (err,result)=>{
+            if(err) {
+            console.log(err)
+            } 
+        res.send(result)
+        });   });
+
+    //Október
+    app.get("/api/get/okt/bev", (req,res)=>{
+        db.query("SELECT SUM(bevetel) FROM adatok WHERE honap = 'Október'", (err,result)=>{
+            if(err) {
+            console.log(err)
+            } 
+        res.send(result)
+        });   });
+    
+    app.get("/api/get/okt/kiad", (req,res)=>{
+        db.query("SELECT SUM(kiadas) FROM adatok WHERE honap = 'Október'", (err,result)=>{
+            if(err) {
+            console.log(err)
+            } 
+        res.send(result)
+        });   });
+
+    //November
+    app.get("/api/get/nov/bev", (req,res)=>{
+        db.query("SELECT SUM(bevetel) FROM adatok WHERE honap = 'November'", (err,result)=>{
+            if(err) {
+            console.log(err)
+            } 
+        res.send(result)
+        });   });
+    
+    app.get("/api/get/nov/kiad", (req,res)=>{
+        db.query("SELECT SUM(kiadas) FROM adatok WHERE honap = 'November'", (err,result)=>{
+            if(err) {
+            console.log(err)
+            } 
+        res.send(result)
+        });   });
+
+    //December
+    app.get("/api/get/dec/bev", (req,res)=>{
+        db.query("SELECT SUM(bevetel) FROM adatok WHERE honap = 'December'", (err,result)=>{
+            if(err) {
+            console.log(err)
+            } 
+        res.send(result)
+        });   });
+    
+    app.get("/api/get/dec/kiad", (req,res)=>{
+        db.query("SELECT SUM(kiadas) FROM adatok WHERE honap = 'December'", (err,result)=>{
+            if(err) {
+            console.log(err)
+            } 
+        res.send(result)
+        });   });
+
 app.listen(process.env.PORT || 3000)
