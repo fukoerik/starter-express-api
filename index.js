@@ -32,12 +32,23 @@ app.get('/api/checkdb', (req, res) => {
     });
   });
 
-app.get("/api/get", (req,res)=>{
-    db.query("SELECT * FROM cashflow", (err,result)=>{
+app.get("/api/get/:ev/:honap", (req,res)=>{
+    const ev = req.params.ev;
+    const honap = req.params.honap;
+    db.query(`SELECT * FROM cashflow WHERE ev = ${ev} AND honap = ${honap} ORDER BY nap ASC`, (err, result) => {
         if(err) {
         console.log(err)
         } 
     res.send(result)
     });   });
+
+    app.get("/api/get/:ev", (req,res)=>{
+        const ev = req.params.ev;
+        db.query(`SELECT * FROM cashflow WHERE ev = ${ev}`, (err, result) => {
+            if(err) {
+            console.log(err)
+            } 
+        res.send(result)
+        });   });
 
 app.listen(process.env.PORT || 3000)
