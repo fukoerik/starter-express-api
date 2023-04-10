@@ -3,7 +3,7 @@ const db = require('./config/db')
 const cors = require('cors')
 
 const app = express();
-const  PORT = 3000;
+const  PORT = 80;
 app.use(cors());
 app.use(express.json())
 
@@ -18,6 +18,17 @@ app.get('/api/checkdb', (req, res) => {
         res.send('Database connection successful');
       }
     });
+  });
+
+
+  app.get("/api/get/calendar", (req, res) => {
+    db.query('SELECT * FROM cashflow',(err, result) => {
+        if (err) {
+          console.log(err);
+        }
+        res.send(result);
+      }
+    );
   });
 
   app.post("/api/add", (req, res) => {
@@ -42,13 +53,17 @@ app.get("/api/get/:ev/:honap", (req,res)=>{
     res.send(result)
     });   });
 
-    app.get("/api/get/:ev", (req,res)=>{
-        const ev = req.params.ev;
-        db.query(`SELECT * FROM cashflow WHERE ev = ${ev}`, (err, result) => {
-            if(err) {
-            console.log(err)
-            } 
-        res.send(result)
-        });   });
+    app.get("/api/get/:ev", (req, res) => {
+      const ev = req.params.ev;
+      db.query(
+        `SELECT honap, SUM(bevetel) AS bevetel, SUM(kiadas) AS kiadas FROM cashflow WHERE ev = ${ev} GROUP BY honap ORDER BY honap ASC`,
+        (err, result) => {
+          if (err) {
+            console.log(err);
+          }
+          res.send(result);
+        }
+      );
+    });
 
-app.listen(process.env.PORT || 3000)
+app.listen(process.env.PORT || 80)
