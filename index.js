@@ -3,7 +3,7 @@ const db = require('./config/db')
 const cors = require('cors')
 
 const app = express();
-const  PORT = 80;
+const  PORT = 3501;
 app.use(cors());
 app.use(express.json())
 
@@ -66,4 +66,8 @@ app.get("/api/get/:ev/:honap", (req,res)=>{
       );
     });
 
-app.listen(process.env.PORT || 80)
+//app.listen(process.env.PORT || 3501)
+
+app.listen(3501, () => {
+  console.log('A szerver fut a 3501-es porton.');
+});
