@@ -3,9 +3,49 @@ const db = require('./config/db')
 const cors = require('cors')
 
 const app = express();
-const  PORT = 80;
+const  PORT = 3501;
 app.use(cors());
 app.use(express.json())
+
+const jwt = require('jsonwebtoken');
+const bodyParser = require('body-parser');
+
+const JWT_SECRET = 'mysecretkey@mysecretkey@mysecretkey@mysecretkey@mysecretkey@mysecretkey@';
+
+const users = [
+  {
+    id: 1,
+    username: 'user1',
+    password: 'password1'
+  },
+  {
+    id: 2,
+    username: 'user2',
+    password: 'password2'
+  }
+];
+
+app.use(bodyParser.json());
+
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  // Ellenőrizzük, hogy a felhasználónév és jelszó helyesek-e
+  const user = users.find(u => u.username === username && u.password === password);
+  if (!user) {
+    return res.status(401).json({
+      message: 'Invalid username or password'
+    });
+  }
+
+  // Ha a felhasználónév és jelszó helyesek, hozzunk létre egy JWT tokent és küldjük vissza a válaszban
+  const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '10h' });
+
+  res.status(200).json({
+    message: 'Login successful',
+    token
+  });
+});
 
 
 app.get('/api/checkdb', (req, res) => {
@@ -22,13 +62,27 @@ app.get('/api/checkdb', (req, res) => {
 
 
   app.get("/api/get/calendar", (req, res) => {
-    db.query('SELECT * FROM cashflow',(err, result) => {
+    const token = req.headers.authorization;
+    if (!token) {
+      return res.status(401).json({
+        message: "Authorization token is required"
+      });
+    }
+  
+    try {
+      const decodedToken = jwt.verify(token.slice(7), JWT_SECRET);
+      // Ha a token valid, folytathatod a kérés végrehajtását
+      db.query('SELECT * FROM cashflow',(err, result) => {
         if (err) {
           console.log(err);
         }
         res.send(result);
-      }
-    );
+      });
+    } catch (err) {
+      return res.status(401).json({
+        message: "Invalid authorization token"
+      });
+    }
   });
 
   app.post("/api/add", (req, res) => {
@@ -66,4 +120,8 @@ app.get("/api/get/:ev/:honap", (req,res)=>{
       );
     });
 
-app.listen(process.env.PORT || 80)
+//app.listen(process.env.PORT || 3501)
+
+app.listen(3501, () => {
+  console.log('A szerver fut a 3501-es porton.');
+});
