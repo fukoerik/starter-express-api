@@ -12,60 +12,77 @@ const bodyParser = require('body-parser');
 
 const JWT_SECRET = 'mysecretkey@mysecretkey@mysecretkey@mysecretkey@mysecretkey@mysecretkey@';
 
-const users = [
-  {
-    id: 1,
-    username: 'user1',
-    password: 'password1'
-  },
-  {
-    id: 2,
-    username: 'user2',
-    password: 'password2'
-  }
-];
-
 app.use(bodyParser.json());
 
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
 
-  // Ellenőrizzük, hogy a felhasználónév és jelszó helyesek-e
-  const user = users.find(u => u.username === username && u.password === password);
-  if (!user) {
-    return res.status(401).json({
-      message: 'Invalid username or password'
+  // Lekérjük az adatbázisból a felhasználót
+  const sql = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;
+  db.query(sql, (error, results) => {
+    if (error) {
+      return res.status(500).json({
+        message: 'Hiba, nincs kapcsolat a szerverrel.'
+      });
+    }
+
+    if (results.length === 0) {
+      return res.status(401).json({
+        message: 'Hibás felhasználónév vagy jelszó!'
+      });
+    }
+
+    // Sikeres bejelentkezés, hozzunk létre egy JWT tokent
+    const user = results[0];
+    const newToken = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '24h' });
+
+    // Frissítjük a felhasználó tokent az adatbázisban
+    const updateTokenQuery = `UPDATE users SET token = '${newToken}' WHERE id = ${user.id}`;
+    db.query(updateTokenQuery, (updateError, updateResults) => {
+      if (updateError) {
+        return res.status(500).json({
+          message: 'Hiba történt az adatbázisban.'
+        });
+      }
+
+      return res.status(200).json({
+        message: `Sikeres bejelentkezés, üdv ${username}!`,
+        token: newToken
+      });
     });
-  }
-
-  // Ha a felhasználónév és jelszó helyesek, hozzunk létre egy JWT tokent és küldjük vissza a válaszban
-  const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '10h' });
-
-  res.status(200).json({
-    message: 'Login successful',
-    token
   });
 });
 
-
-app.get('/api/checkdb', (req, res) => {
-    db.connect((err) => {
+app.get("/user/get/:token", (req, res) => {
+  const token = req.params.token.toString();
+  db.query(
+    `SELECT username FROM users WHERE token = '${token}'`,
+    (err, result) => {
       if (err) {
-        console.error('Error connecting to database: ' + err.stack);
-        res.status(500).send('Error connecting to database');
-      } else {
-        console.log('Connected to database as id ' + db.threadId);
-        res.send('Database connection successful');
+        console.log(err);
       }
-    });
-  });
+      res.send(result);
+    }
+  );
+});
 
+
+app.post('/validate', (req, res) => {
+  const { token } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, 'jwt_secret_key');
+    res.status(200).json({ message: 'A token  rv nyes.' });
+  } catch (err) {
+    res.status(401).json({ message: 'A token lej rt vagy hib s.' });
+  }
+});
 
   app.get("/api/get/calendar", (req, res) => {
     const token = req.headers.authorization;
     if (!token) {
       return res.status(401).json({
-        message: "Authorization token is required"
+        message: "A lekérdezéshez szükséged van egy tokenre!"
       });
     }
   
@@ -80,21 +97,36 @@ app.get('/api/checkdb', (req, res) => {
       });
     } catch (err) {
       return res.status(401).json({
-        message: "Invalid authorization token"
+        message: "Hibás token!"
       });
     }
   });
 
   app.post("/api/add", (req, res) => {
-    const {id, bevetel, kiadas, nap, honap, ev} = req.body;
-    db.query("INSERT INTO cashflow (id, bevetel, kiadas, nap, honap, ev) VALUES (?, ?, ?, ?, ?, ?)", [id, bevetel, kiadas, nap, honap, ev], (err, result) => {
-      if (err) {
-        console.log(err);
-        res.status(500).send("Error adding data");
-      } else {
-        res.status(200).send("Data added successfully");
-      }
-    });
+    const token = req.headers.authorization;
+    if (!token) {
+      return res.status(401).json({
+        message: "Az adatok hozzáadásához szükséges egy token!"
+      });
+    }
+  
+    try {
+      const decodedToken = jwt.verify(token.slice(7), JWT_SECRET);
+      // Ha a token valid, folytathatod az adatok hozzáadását
+      const {id, bevetel, kiadas, nap, honap, ev} = req.body;
+      db.query("INSERT INTO cashflow (id, bevetel, kiadas, nap, honap, ev) VALUES (?, ?, ?, ?, ?, ?)", [id, bevetel, kiadas, nap, honap, ev], (err, result) => {
+        if (err) {
+          console.log(err);
+          res.status(500).send("Error adding data");
+        } else {
+          res.status(200).send("Data added successfully");
+        }
+      });
+    } catch (err) {
+      return res.status(401).json({
+        message: "Hibás token!"
+      });
+    }
   });
 
 app.get("/api/get/:ev/:honap", (req,res)=>{
